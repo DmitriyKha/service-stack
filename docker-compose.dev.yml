@@ -1,0 +1,73 @@
+services:
+  backend:
+    build: ./src/backend
+    container_name: backend
+    networks:
+      - default
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./src/backend/app:/working/app
+    command: python main.py
+
+  postgres:
+    image: postgres:17
+    restart: always
+    container_name: postgres
+    shm_size: 128mb
+    ports:
+      - 5432:5432
+    networks:
+      - postgres-network
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: class
+      POSTGRES_DB: test
+    volumes:
+      # если нужно сохранить состояние (в корне создать pg-data)
+      # - ./pg-data:/var/lib/postgresql/data
+      # - ./src/backend/app/init.sql:/docker-entrypoint-initdb.d/init.sql
+      #
+      # - ./src/backend/app/Chinook_PostgreSql.sql:/docker-entrypoint-initdb.d/Chinook_PostgreSql.sql
+      - ./src/backend/app/Chinook_PostgreSql_AutoIncrementPKs.sql:/docker-entrypoint-initdb.d/Chinook_PostgreSql_AutoIncrementPKs.sql
+      # - ./src/backend/app/Chinook_PostgreSql_SerialPKs.sql:/docker-entrypoint-initdb.d/Chinook_PostgreSql_SerialPKs.sql
+
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: pgadmin
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   ports:
+  #     - 15433:80
+  #   networks:
+  #     - postgres-network
+  #   volumes:
+  #     - ./pgadmin-data:/var/lib/pgadmin/
+  #   depends_on:
+  #     - postgres
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 15434:8080
+    networks:
+      - postgres-network
+    depends_on:
+      - postgres
+
+  # vault:
+  #   image: hashicorp/vault:latest
+  #   container_name: vault
+  #   ports:
+  #     - "8200:8200"
+
+networks:
+  default:
+  postgres-network:
+    driver: bridge
+
+# docker compose -f <file> config
+# docker inspect
