@@ -1,0 +1,80 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/back.Dockerfile
+    container_name: backend
+    networks:
+      - default
+    ports:
+      - "10010:8080"
+      - "10011:8888"
+    volumes:
+      - ./src/app:/working/app
+    command: >
+      sh -c "python main.py &
+      jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --ServerApp.password='' --ServerApp.token=''"
+    # depends_on:
+    #   - postgres
+
+  postgres:
+    image: postgres:17
+    restart: always
+    container_name: postgres
+    shm_size: 128mb
+    ports:
+      - 10020:5432
+    networks:
+      - postgres-network
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: class
+      POSTGRES_DB: test
+    volumes:
+      # если нужно сохранить состояние (в корне создать pg-data)
+      # - ./pg-data:/var/lib/postgresql/data
+      # - ./src/backend/app/init.sql:/docker-entrypoint-initdb.d/init.sql
+      #
+      # - ./src/backend/app/Chinook_PostgreSql.sql:/docker-entrypoint-initdb.d/Chinook_PostgreSql.sql
+      - ./src/app/Chinook_PostgreSql_AutoIncrementPKs.sql:/docker-entrypoint-initdb.d/Chinook_PostgreSql_AutoIncrementPKs.sql
+      # - ./src/backend/app/Chinook_PostgreSql_SerialPKs.sql:/docker-entrypoint-initdb.d/Chinook_PostgreSql_SerialPKs.sql
+
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: pgadmin
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   ports:
+  #     - 15433:80
+  #   networks:
+  #     - postgres-network
+  #   volumes:
+  #     - ./pgadmin-data:/var/lib/pgadmin/
+  #   depends_on:
+  #     - postgres
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 10030:8080
+    networks:
+      - postgres-network
+    depends_on:
+      - postgres
+
+  # vault:
+  #   image: hashicorp/vault:latest
+  #   container_name: vault
+  #   ports:
+  #     - "8200:8200"
+
+networks:
+  default:
+  postgres-network:
+    driver: bridge
+
+# docker compose -f <file> config
+# docker inspect

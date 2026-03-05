@@ -1,10 +1,9 @@
 requests
 psycopg2-binary
-
-
-
-
-
+alembic
+pandas
+sqlalchemy
+jupyter
 
 
 prometheus_client
