@@ -1,5 +1,10 @@
+# (10010 app) 10011 - backend, 10012 - jupyter
+# (10020 DB access) 10021 - adminer, 10022 - mongo-exspress
+#
+
 services:
   backend:
+    image: backend
     build:
       context: .
       dockerfile: docker/back.Dockerfile
@@ -7,13 +12,14 @@ services:
     networks:
       - default
     ports:
-      - "10010:8080"
-      - "10011:8888"
+      - "10011:8080"
+      - "10012:8888"
     volumes:
       - ./src/app:/working/app
     command: >
       sh -c "python main.py &
-      jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --ServerApp.password='' --ServerApp.token=''"
+      jupyter lab --ip=0.0.0.0 --port=8888 --no-browser
+      --allow-root --ServerApp.password='' --ServerApp.token=''"
     # depends_on:
     #   - postgres
 
@@ -23,7 +29,7 @@ services:
     container_name: postgres
     shm_size: 128mb
     ports:
-      - 10020:5432
+      - 10031:5432
     networks:
       - postgres-network
     environment:
@@ -32,7 +38,7 @@ services:
       POSTGRES_DB: test
     volumes:
       # если нужно сохранить состояние (в корне создать pg-data)
-      # - ./pg-data:/var/lib/postgresql/data
+      # - ./data-pg:/var/lib/postgresql/data
       # - ./src/backend/app/init.sql:/docker-entrypoint-initdb.d/init.sql
       #
       # - ./src/backend/app/Chinook_PostgreSql.sql:/docker-entrypoint-initdb.d/Chinook_PostgreSql.sql
@@ -54,22 +60,40 @@ services:
   #   depends_on:
   #     - postgres
 
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 10022:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
+      ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+
+  # Redis
+  # -v /docker/host/dir:/data
+  redis:
+    image: redis
+    restart: unless-stopped
+
   adminer:
     image: adminer
     container_name: adminer
     restart: always
     ports:
-      - 10030:8080
+      - 10021:8080
     networks:
       - postgres-network
     depends_on:
       - postgres
-
-  # vault:
-  #   image: hashicorp/vault:latest
-  #   container_name: vault
-  #   ports:
-  #     - "8200:8200"
 
 networks:
   default:
