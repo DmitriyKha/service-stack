@@ -61,12 +61,29 @@ services:
   #   depends_on:
   #     - postgres
 
-  mongo:
+  mongo1:
     image: mongo
+    container_name: mongo1
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    depends_on:
+      - mongo2
+      - mongo3
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    #   MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo2:
+    image: mongo
+    container_name: mongo2
+    restart: always
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+
+  mongo3:
+    image: mongo
+    container_name: mongo3
+    restart: always
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
 
   mongo-express:
     image: mongo-express
