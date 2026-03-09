@@ -52,3 +52,11 @@ docker exec -it container-name mongosh -u root -p example
 help
 show databases
 ```
+### alembic
+```sh
+alembic init alembic
+
+
+alembic revision --autogenerate -m "initial"
+alembic upgrade head
+```
