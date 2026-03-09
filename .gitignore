@@ -2,11 +2,8 @@
 test
 
 docker/test*
-pg-data/
-pgadmin-data/
 data-pg/
 data-pgadmin/
-src/app/
 
 src/app/notebooks/.ipynb_checkpoints/*
 src/app/.ipynb_checkpoints/*
