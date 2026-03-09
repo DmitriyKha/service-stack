@@ -1,3 +1,12 @@
+100** app
+10011 - backend
+10012 - jupyter
+
+100** DB access
+10021 - adminer
+10022 - mongo-exspress
+
+
 ### docker compose
 ```sh
 docker compose -f docker-compose.dev2.yml up --build
@@ -20,6 +29,16 @@ git checkout -b brance-name
 git remote -v
 git commit -S -m ""
 git log --graph
+
+
+git fetch -p # удаляет ссылки на несуществующие ветки в удаленном
+git branch -r # ветки в удаленных
+git push repo --delete branch # удаление ветки в удаленном
+
+
+git rm -r --cached src/app/.ipynb_checkpoints/
+git restore --staged .
+
 ```
 
 ### mongosh

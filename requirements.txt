@@ -3,6 +3,7 @@ psycopg2-binary
 alembic
 sqlalchemy
 faker
+python-dateutil
 
 pandas
 jupyter
