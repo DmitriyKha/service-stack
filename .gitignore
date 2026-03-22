@@ -5,6 +5,5 @@ docker/test*
 data-pg/
 data-pgadmin/
 
-src/app/notebooks/.ipynb_checkpoints/*
-src/app/.ipynb_checkpoints/*
-src/app/__pycache__/*
+*__pycache__/
+*.ipynb_checkpoints/
